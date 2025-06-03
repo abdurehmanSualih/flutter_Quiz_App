@@ -115,3 +115,25 @@ app.post("/api/auth/signup", async (req, res) => {
       .json({ message: "Error creating user", error: err.message });
   }
 });
+
+
+// Signin Endpoint
+app.post("/api/auth/signin", async (req, res) => {
+  try {
+    console.log("Signin request:", req.body);
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      console.log("Invalid credentials:", email);
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+    const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
+      expiresIn: "1h",
+    });
+    console.log("Signin successful:", email);
+    res.json({ token, user: { email: user.email } });
+  } catch (err) {
+    console.error("Signin error:", err);
+    res.status(500).json({ message: "Error signing in", error: err.message });
+  }
+});
