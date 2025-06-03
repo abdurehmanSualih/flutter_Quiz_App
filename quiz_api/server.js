@@ -137,3 +137,17 @@ app.post("/api/auth/signin", async (req, res) => {
     res.status(500).json({ message: "Error signing in", error: err.message });
   }
 });
+
+// Question Endpoints
+app.get("/api/questions", async (req, res) => {
+  try {
+    console.log("Fetching questions");
+    const questions = await Question.find();
+    res.json(questions);
+  } catch (err) {
+    console.error("Fetch questions error:", err);
+    res
+      .status(500)
+      .json({ message: "Error fetching questions", error: err.message });
+  }
+});
