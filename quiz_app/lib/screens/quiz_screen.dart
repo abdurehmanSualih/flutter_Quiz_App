@@ -5,7 +5,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:quiz_app/models/question.dart';
 import 'package:quiz_app/services/api_service.dart';
-import 'result_screen.dart';
+import '../result_screen.dart';
 
 class QuizScreen extends StatefulWidget {
   const QuizScreen({super.key});
