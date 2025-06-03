@@ -151,3 +151,75 @@ app.get("/api/questions", async (req, res) => {
       .json({ message: "Error fetching questions", error: err.message });
   }
 });
+
+app.post(
+  "/api/questions",
+  authenticateJWT,
+  authenticateAdminKey,
+  async (req, res) => {
+    try {
+      console.log("Adding question:", req.body);
+      const question = new Question(req.body);
+      await question.save();
+      res.status(201).json(question);
+    } catch (err) {
+      console.error("Add question error:", err);
+      res
+        .status(400)
+        .json({ message: "Error adding question", error: err.message });
+    }
+  }
+);
+
+app.put(
+  "/api/questions/:id",
+  authenticateJWT,
+  authenticateAdminKey,
+  async (req, res) => {
+    try {
+      console.log("Updating question:", req.params.id, req.body);
+      const question = await Question.findByIdAndUpdate(
+        req.params.id,
+        req.body,
+        { new: true }
+      );
+      if (!question) {
+        console.log("Question not found:", req.params.id);
+        return res.status(404).json({ message: "Question not found" });
+      }
+      res.json(question);
+    } catch (err) {
+      console.error("Update question error:", err);
+      res
+        .status(400)
+        .json({ message: "Error updating question", error: err.message });
+    }
+  }
+);
+
+app.delete(
+  "/api/questions/:id",
+  authenticateJWT,
+  authenticateAdminKey,
+  async (req, res) => {
+    try {
+      console.log("Deleting question:", req.params.id);
+      const question = await Question.findByIdAndDelete(req.params.id);
+      if (!question) {
+        console.log("Question not found:", req.params.id);
+        return res.status(404).json({ message: "Question not found" });
+      }
+      res.status(204).send();
+    } catch (err) {
+      console.error("Delete question error:", err);
+      res
+        .status(400)
+        .json({ message: "Error deleting question", error: err.message });
+    }
+  }
+);
+
+// Start Server
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});
