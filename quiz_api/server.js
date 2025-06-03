@@ -55,3 +55,28 @@ mongoose
   .catch((err) => {
     console.error("MongoDB connection error:", err);
   });
+
+
+  // Question Schema
+const questionSchema = new mongoose.Schema(
+  {
+    question: { type: String, required: true },
+    options: { type: [String], required: true },
+    correctAnswer: { type: String, required: true },
+    explanation: { type: String, required: true },
+  },
+  { timestamps: true }
+);
+
+const Question = mongoose.model("Question", questionSchema);
+
+// User Schema
+const userSchema = new mongoose.Schema(
+  {
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+  },
+  { timestamps: true }
+);
+
+const User = mongoose.model("User", userSchema);
