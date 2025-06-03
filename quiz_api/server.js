@@ -80,3 +80,38 @@ const userSchema = new mongoose.Schema(
 );
 
 const User = mongoose.model("User", userSchema);
+
+
+
+
+
+
+
+// Signup Endpoint
+app.post("/api/auth/signup", async (req, res) => {
+  try {
+    console.log("Signup request:", req.body);
+    const { email, password } = req.body;
+    if (!email || !password) {
+      console.log("Missing email or password");
+      return res
+        .status(400)
+        .json({ message: "Email and password are required" });
+    }
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      console.log("User already exists:", email);
+      return res.status(400).json({ message: "User already exists" });
+    }
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = new User({ email, password: hashedPassword });
+    await user.save();
+    console.log("User created:", email);
+    res.status(201).json({ message: "User created successfully" });
+  } catch (err) {
+    console.error("Signup error:", err);
+    res
+      .status(500)
+      .json({ message: "Error creating user", error: err.message });
+  }
+});
