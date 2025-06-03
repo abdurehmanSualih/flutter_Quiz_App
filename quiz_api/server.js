@@ -56,8 +56,7 @@ mongoose
     console.error("MongoDB connection error:", err);
   });
 
-
-  // Question Schema
+// Question Schema
 const questionSchema = new mongoose.Schema(
   {
     question: { type: String, required: true },
@@ -81,11 +80,37 @@ const userSchema = new mongoose.Schema(
 
 const User = mongoose.model("User", userSchema);
 
+// JWT Middleware
+const authenticateJWT = async (req, res, next) => {
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) {
+    console.log("No token provided");
+    return res.status(401).json({ message: "No token provided" });
+  }
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = await User.findById(decoded.userId);
+    if (!req.user) {
+      console.log("User not found for token:", decoded.userId);
+      return res.status(401).json({ message: "User not found" });
+    }
+    next();
+  } catch (err) {
+    console.log("Invalid token:", err.message);
+    return res.status(401).json({ message: "Invalid token" });
+  }
+};
 
-
-
-
-
+// Admin API Key Middleware
+const authenticateAdminKey = (req, res, next) => {
+  const apiKey = req.headers["x-api-key"];
+  if (apiKey && apiKey === ADMIN_API_KEY) {
+    next();
+  } else {
+    console.log("Invalid or missing API key:", apiKey);
+    res.status(401).json({ message: "Invalid or missing API key" });
+  }
+};
 
 // Signup Endpoint
 app.post("/api/auth/signup", async (req, res) => {
@@ -115,7 +140,6 @@ app.post("/api/auth/signup", async (req, res) => {
       .json({ message: "Error creating user", error: err.message });
   }
 });
-
 
 // Signin Endpoint
 app.post("/api/auth/signin", async (req, res) => {
