@@ -37,3 +37,21 @@ app.use(cors({ origin: "*", credentials: true }));
 // app.use(cors(corsOptions));
 
 // Log incoming requests
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
+});
+
+app.use(express.json());
+
+mongoose
+  .connect(MONGODB_URI)
+  .then(() => {
+    console.log(
+      "Connected to MongoDB:",
+      MONGODB_URI.replace(/:[^@]+@/, ":<password>@")
+    );
+  })
+  .catch((err) => {
+    console.error("MongoDB connection error:", err);
+  });
