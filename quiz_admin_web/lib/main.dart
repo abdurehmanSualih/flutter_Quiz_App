@@ -21,7 +21,10 @@ class QuizAdminApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Quiz Admin Web',
-      theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        useMaterial3: true,
+      ),
       home: FutureBuilder<bool>(
         future: _isAuthenticated(),
         builder: (context, snapshot) {
